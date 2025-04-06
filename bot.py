@@ -60,7 +60,7 @@ async def handle_answer(message: message, state: FSMContext):
             [KeyboardButton(text="Плаки-плаки, назад в меню", )],
         ]
         keyboard = types.ReplyKeyboardMarkup(keyboard=kb, resize_keyboard=True, input_field_placeholder="Хмм...")
-        await message.answer_photo(photo=FSInputFile(f'.\\answers\plot{pic}.png'), caption="ХАХАХАХАХХААХ, ТЫ ПРАИБАЛ БЭТМАН", reply_markup=keyboard)
+        await message.answer_photo(photo=FSInputFile(f'.\\answers\plot{pic}.png'), caption="Нет", reply_markup=keyboard)
 
 
 
@@ -109,7 +109,7 @@ async def photo(message: message):
 @dp.callback_query()
 async def handle_callback(callback: CallbackQuery):
     if callback.data == "tralalelo":
-        await callback.answer("Кнопка нажата!")  # Показывает всплывающее уведомление
+        await callback.answer("Кнопка нажата!")
         await callback.message.answer("Ты нажал на кнопку tralalelo 🎉")
 
 
