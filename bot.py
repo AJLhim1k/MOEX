@@ -35,7 +35,6 @@ async def send_welcome(message: message, state: FSMContext):
     make_graph(pic, "q")
     await state.update_data(current_pic=pic)
     await message.answer_photo(photo=FSInputFile(f'.\questions\plot{pic}.png'), caption="Начнем игру!\nОпредели, есть ли на данном графике манипуляуция?", reply_markup=keyboard)
-    # Устанавливаем состояние
     await state.set_state(GameState.waiting_for_answer)
 
 
@@ -49,7 +48,7 @@ async def handle_answer(message: message, state: FSMContext):
     pic = data.get("current_pic")
     make_graph(pic, "ans")
     await state.update_data(current_pic=pic)
-    user_response = message.text  # <-- вот здесь ты получаешь ответ пользователя
+    user_response = message.text
     if user_response == "Long shares":
         kb = [
             [KeyboardButton(text="Круто! Назад в меню", )],
