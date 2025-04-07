@@ -35,7 +35,6 @@ async def send_welcome(message: message, state: FSMContext):
     make_graph(pic, "q")
     await state.update_data(current_pic=pic)
     await message.answer_photo(photo=FSInputFile(f'.\questions\plot{pic}.png'), caption="Начнем игру!\nОпредели, есть ли на данном графике манипуляуция?", reply_markup=keyboard)
-    # Устанавливаем состояние
     await state.set_state(GameState.waiting_for_answer)
 
 
@@ -49,7 +48,7 @@ async def handle_answer(message: message, state: FSMContext):
     pic = data.get("current_pic")
     make_graph(pic, "ans")
     await state.update_data(current_pic=pic)
-    user_response = message.text  # <-- вот здесь ты получаешь ответ пользователя
+    user_response = message.text
     if user_response == "Long shares":
         kb = [
             [KeyboardButton(text="Круто! Назад в меню", )],
@@ -61,7 +60,7 @@ async def handle_answer(message: message, state: FSMContext):
             [KeyboardButton(text="Плаки-плаки, назад в меню", )],
         ]
         keyboard = types.ReplyKeyboardMarkup(keyboard=kb, resize_keyboard=True, input_field_placeholder="Хмм...")
-        await message.answer_photo(photo=FSInputFile(f'.\\answers\plot{pic}.png'), caption="ХАХАХАХАХХААХ, ТЫ ПРАИБАЛ БЭТМАН", reply_markup=keyboard)
+        await message.answer_photo(photo=FSInputFile(f'.\\answers\plot{pic}.png'), caption="Нет", reply_markup=keyboard)
 
 
 
@@ -110,7 +109,7 @@ async def photo(message: message):
 @dp.callback_query()
 async def handle_callback(callback: CallbackQuery):
     if callback.data == "tralalelo":
-        await callback.answer("Кнопка нажата!")  # Показывает всплывающее уведомление
+        await callback.answer("Кнопка нажата!")
         await callback.message.answer("Ты нажал на кнопку tralalelo 🎉")
 
 
