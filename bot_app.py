@@ -27,7 +27,7 @@ async def send_welcome(message: types.Message):
             [
                 KeyboardButton(
                     text='gfdgerg',
-                    web_app=WebAppInfo(url='http://wiki.cs.hse.ru/Заглавная_страница'))
+                    web_app=WebAppInfo(url='https://ajlhim1k.github.io/MOEX/bot_app.html'))
             ]
         ],
         resize_keyboard=True
