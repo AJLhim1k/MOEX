@@ -60,7 +60,13 @@
     <h1>Пример Telegram WebApp</h1>
     <img src="questions/plot100.png" alt="График">
     <p>Это простой пример взаимодействия Telegram WebApp с пользователем.</p>
-    <button id="buy">Продолжить</button>
+    <button id="quizBtn">Перейти к викторине</button>
   </div>
+
+  <script>
+    document.getElementById('quizBtn').addEventListener('click', () => {
+      window.location.href = 'quiz.html';
+    });
+  </script>
 </body>
 </html>
