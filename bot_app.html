@@ -37,13 +37,12 @@
 <body>
   <div id="container">
     <h2>Хочешь пройти викторину?</h2>
-    <button onclick="startQuiz()">Начать викторину</button>
+    <button onclick="goToQuiz()">Начать викторину</button>
   </div>
 
   <script>
-    function startQuiz() {
-      const tg = window.Telegram.WebApp;
-      tg.sendData("викторина");
+    function goToQuiz() {
+      window.location.href = "quiz.html"; // переход на другую страницу
     }
   </script>
 </body>
