@@ -1,4 +1,6 @@
 [
-  "plot100.png",
-  "plot101.png"
+  {
+    "file": "plot100.png",
+    "up": true
+  }
 ]

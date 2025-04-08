@@ -1,17 +1,15 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Telegram WebApp Пример</title>
 
-  <link rel="stylesheet" href="https://pyscript.net/releases/2025.3.1/core.css" />
-  <script type="module" src="https://pyscript.net/releases/2025.3.1/core.js"></script>
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <link href="https://fonts.googleapis.com/css?family=Muli&display=swap" rel="stylesheet" />
+
   <style>
     body {
-      font-family: Arial, sans-serif;
+      font-family: 'Muli', sans-serif;
       margin: 0;
       padding: 0;
       background-color: #f9f9f9;
@@ -20,7 +18,10 @@
       justify-content: center;
       align-items: center;
       height: 100vh;
+      position: relative;
+      overflow: hidden;
     }
+
     #main {
       background-color: white;
       padding: 20px;
@@ -28,23 +29,24 @@
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
       max-width: 400px;
       text-align: center;
+      z-index: 1;
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeIn 0.4s ease-out forwards;
     }
+
     #main h1 {
       font-size: 24px;
       margin-bottom: 20px;
     }
-    #main img {
-      max-width: 100%;
-      height: auto;
-      margin-bottom: 20px;
-      border-radius: 8px;
-    }
+
     #main p {
       font-size: 16px;
       margin-bottom: 20px;
     }
+
     #main button {
-      background-color: #2AABEE;
+      background-color: #d40000;
       color: white;
       border: none;
       padding: 10px 20px;
@@ -53,23 +55,101 @@
       cursor: pointer;
       transition: background-color 0.3s;
     }
+
     #main button:hover {
-      background-color: #229ac5;
+      background-color: #bb0000;
+    }
+
+    /* Анимация логотипа */
+    #logoAnimation {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0.8);
+      opacity: 0;
+      animation: logoEnter 1.2s ease-out forwards;
+      z-index: 10;
+      display: none;
+    }
+
+    #logoAnimation img {
+      width: 220px;
+      height: auto;
+    }
+
+    @keyframes logoEnter {
+      0% {
+        transform: translate(-50%, -50%) scale(1.2);
+        opacity: 0;
+      }
+      50% {
+        transform: translate(-50%, -50%) scale(1.6);
+        opacity: 1;
+      }
+      100% {
+        transform: translate(-50%, -50%) scale(1.4);
+        opacity: 1;
+      }
+    }
+
+    .fade-out {
+      animation: fadeOut 0.5s ease-out forwards;
+    }
+
+    @keyframes fadeOut {
+      to {
+        opacity: 0;
+        transform: scale(0.95);
+      }
+    }
+
+    /* Анимация появления */
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
   </style>
 </head>
 <body>
+
   <div id="main">
     <h1>Пример Telegram WebApp</h1>
-    <img src="questions/plot100.png" alt="График">
     <p>Это простой пример взаимодействия Telegram WebApp с пользователем.</p>
     <button id="quizBtn">Перейти к викторине</button>
   </div>
 
+  <!-- Логотип MOEX с анимацией -->
+  <div id="logoAnimation">
+    <img src="moex.png" alt="MOEX logo" />
+  </div>
+
   <script>
-    document.getElementById('quizBtn').addEventListener('click', () => {
-      window.location.href = 'quiz.html';
+    const quizBtn = document.getElementById('quizBtn');
+    const mainContent = document.getElementById('main');
+    const logo = document.getElementById('logoAnimation');
+
+    quizBtn.addEventListener('click', () => {
+      // Скрыть основной контент с анимацией
+      mainContent.classList.add('fade-out');
+
+      // Показать логотип и запустить анимацию
+      setTimeout(() => {
+        mainContent.style.display = 'none';
+        logo.style.display = 'block';
+
+        // После завершения анимации — переход на quiz.html
+        setTimeout(() => {
+          window.location.href = 'quiz.html';
+        }, 1000); // время анимации логотипа
+      }, 200); // время fade-out
     });
   </script>
+
 </body>
 </html>

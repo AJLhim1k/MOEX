@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Правильно!</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #e6f9f0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    #result-container {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      max-width: 400px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 0 12px rgba(0, 0, 0, 0.1);
+      animation: fadeIn 0.5s ease;
+    }
+
+    img {
+      max-width: 100%;
+      border-radius: 10px;
+      margin: 20px 0;
+    }
+
+    h1 {
+      font-size: 24px;
+      color: #2d7a4b;
+    }
+
+    p {
+      font-size: 16px;
+      color: #333;
+    }
+
+    .back-btn {
+      margin-top: 20px;
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #2AABEE;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .back-btn:hover {
+      background-color: #229ac5;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: scale(1.03);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="result-container">
+    <h1>Отлично! Вы угадали 📈</h1>
+    <p>Вот как двигалась цена:</p>
+    <img id="answer-graph" src="" alt="Ответ" />
+    <button class="back-btn" onclick="location.href='bot_app.html'">В меню</button>
+  </div>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const filename = params.get('file');
+    if (filename) {
+      document.getElementById("answer-graph").src = `answers/${filename}`;
+    } else {
+      document.getElementById("answer-graph").alt = "Файл не указан.";
+    }
+  </script>
+</body>
+</html>
