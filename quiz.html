@@ -4,7 +4,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Quiz</title>
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <link rel="stylesheet" href="https://pyscript.net/latest/pyscript.css" />
+  <script defer src="https://pyscript.net/latest/pyscript.js"></script>
+  <py-config>
+    packages = []
+  </py-config>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -48,25 +52,35 @@
   <div id="quiz-container">
     <h2>Выбери направление графика</h2>
     <img id="graph-img" src="" alt="График">
-    <div>
-      <button onclick="answer('Long shares')">Long shares</button>
-      <button onclick="answer('Short shares')">Short shares</button>
-    </div>
+    <form method="GET" id="quiz-form">
+      <input type="hidden" name="answer" id="answer">
+      <button type="submit" name="long" value="true" onclick="document.getElementById('answer').value='long'">Long shares</button>
+      <button type="submit" name="short" value="true" onclick="document.getElementById('answer').value='short'">Short shares</button>
+    </form>
   </div>
 
-  <script>
-    const img = document.getElementById("graph-img");
+  <py-script>
+from pyodide.ffi import create_proxy
+import random
+from js import document, window
 
-    // Генерация случайного номера графика
-    const graphNumber = Math.floor(Math.random() * 20) + 100; // от 100 до 119
-    const imagePath = `questions/plot100.png`;
-    img.src = imagePath;
+# Выбираем график
+img = document.getElementById("graph-img")
+graph_number = random.randint(100, 119)
+img.setAttribute("src", f"questions/plot{graph_number}.png")
 
-    function answer(choice) {
-      const tg = window.Telegram.WebApp;
-      tg.sendData(`${choice} для графика №${graphNumber}`);
-      tg.close();
-    }
-  </script>
+# Подключение к форме и обработка перехода
+form = document.getElementById("quiz-form")
+
+def handle_submit(evt):
+    evt.preventDefault()
+    answer = document.getElementById("answer").value
+    if answer == "long":
+        window.location.href = "correct.html"
+    else:
+        window.location.href = "wrong.html"
+
+form.addEventListener("submit", create_proxy(handle_submit))
+  </py-script>
 </body>
 </html>

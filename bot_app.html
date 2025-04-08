@@ -3,47 +3,73 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Викторина</title>
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Telegram WebApp Пример</title>
+
+  <link rel="stylesheet" href="https://pyscript.net/releases/2025.3.1/core.css" />
+  <script type="module" src="https://pyscript.net/releases/2025.3.1/core.js"></script>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
     body {
       font-family: Arial, sans-serif;
-      background-color: #eef2f5;
+      margin: 0;
+      padding: 0;
+      background-color: #f9f9f9;
+      color: #333;
       display: flex;
       justify-content: center;
       align-items: center;
       height: 100vh;
-      margin: 0;
     }
-    #container {
-      background: #fff;
+    #main {
+      background-color: white;
       padding: 20px;
       border-radius: 10px;
-      box-shadow: 0 0 8px rgba(0,0,0,0.1);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      max-width: 400px;
       text-align: center;
     }
-    button {
+    #main h1 {
+      font-size: 24px;
+      margin-bottom: 20px;
+    }
+    #main img {
+      max-width: 100%;
+      height: auto;
+      margin-bottom: 20px;
+      border-radius: 8px;
+    }
+    #main p {
+      font-size: 16px;
+      margin-bottom: 20px;
+    }
+    #main button {
       background-color: #2AABEE;
       color: white;
-      padding: 10px 20px;
       border: none;
+      padding: 10px 20px;
+      font-size: 16px;
       border-radius: 8px;
       cursor: pointer;
-      font-size: 16px;
-      margin-top: 20px;
+      transition: background-color 0.3s;
+    }
+    #main button:hover {
+      background-color: #229ac5;
     }
   </style>
 </head>
 <body>
-  <div id="container">
-    <h2>Хочешь пройти викторину?</h2>
-    <button onclick="goToQuiz()">Начать викторину</button>
+  <div id="main">
+    <h1>Пример Telegram WebApp</h1>
+    <img src="questions/plot100.png" alt="График">
+    <p>Это простой пример взаимодействия Telegram WebApp с пользователем.</p>
+    <button id="quizBtn">Перейти к викторине</button>
   </div>
 
   <script>
-    function goToQuiz() {
-      window.location.href = "quiz.html"; // переход на другую страницу
-    }
+    document.getElementById('quizBtn').addEventListener('click', () => {
+      window.location.href = 'quiz.html';
+    });
   </script>
 </body>
 </html>
