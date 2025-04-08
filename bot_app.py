@@ -13,6 +13,7 @@ import random
 import os
 from aiogram.fsm.state import State, StatesGroup
 from kots import make_graph
+from list_js import new_q
 
 load_dotenv()
 TELEGRAM_API_KEY = os.getenv('TELEGRAM_API_KEY')
@@ -22,6 +23,7 @@ dp = Dispatcher()
 
 @dp.message(Command('start'))
 async def send_welcome(message: types.Message):
+    new_q()
     markup = ReplyKeyboardMarkup(
         keyboard=[
             [
