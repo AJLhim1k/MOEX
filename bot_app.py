@@ -28,13 +28,13 @@ async def send_welcome(message: types.Message):
         keyboard=[
             [
                 KeyboardButton(
-                    text='gfdgerg',
+                    text='Играть',
                     web_app=WebAppInfo(url='https://ajlhim1k.github.io/MOEX/bot_app.html'))
             ]
         ],
         resize_keyboard=True
     )
-    await message.answer("sdgsdfgsdf", reply_markup=markup)
+    await message.answer("Привет! Начнем игру?", reply_markup=markup)
 
 
 

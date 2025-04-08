@@ -32,19 +32,87 @@
       margin-bottom: 20px;
     }
 
+    .button-container {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin-top: 20px;
+    }
+
     button {
-      padding: 10px 20px;
+      padding: 12px 24px;
       font-size: 16px;
-      margin: 10px;
       border: none;
       border-radius: 8px;
-      background-color: #2AABEE;
       color: white;
       cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s ease;
+      min-width: 120px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #long-btn {
+      background-color: #4CAF50;
+    }
+
+    #short-btn {
+      background-color: #F44336;
     }
 
     button:hover {
-      background-color: #229ac5;
+      transform: translateY(-3px);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+
+    button:active {
+      transform: translateY(1px);
+    }
+
+    #long-btn::before {
+      content: "↑";
+      position: absolute;
+      left: 15px;
+      font-size: 20px;
+      animation: rise 1.5s infinite ease-in-out;
+    }
+
+    @keyframes rise {
+      0%, 100% {
+        transform: translateY(0);
+        opacity: 1;
+      }
+      50% {
+        transform: translateY(-10px);
+        opacity: 0.7;
+      }
+    }
+
+    /* Анимация для кнопки Short (📉) */
+    #short-btn::before {
+      content: "↓";
+      position: absolute;
+      left: 15px;
+      font-size: 20px;
+      animation: fall 1.5s infinite ease-in-out;
+    }
+
+    @keyframes fall {
+      0%, 100% {
+        transform: translateY(0);
+        opacity: 1;
+      }
+      50% {
+        transform: translateY(10px);
+        opacity: 0.7;
+      }
+    }
+
+    .button-text {
+      margin-left: 20px;
     }
 
     .fade-out {
@@ -68,6 +136,8 @@
         transform: scale(1);
       }
     }
+
+
   </style>
 </head>
 <body>
@@ -76,8 +146,14 @@
     <img id="graph-img" src="" alt="График">
     <form id="quiz-form">
       <input type="hidden" name="answer" id="answer">
-      <button type="submit" onclick="setAnswer('long')">Long shares</button>
-      <button type="submit" onclick="setAnswer('short')">Short shares</button>
+      <div class="button-container">
+        <button type="submit" id="long-btn" onclick="setAnswer('long')">
+          <span class="button-text">Long shares</span>
+        </button>
+        <button type="submit" id="short-btn" onclick="setAnswer('short')">
+          <span class="button-text">Short shares</span>
+        </button>
+      </div>
     </form>
   </div>
 

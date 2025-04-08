@@ -45,22 +45,69 @@
       margin-bottom: 20px;
     }
 
-    #main button {
+    .buttons-container {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin-top: 20px;
+    }
+
+    .arrow-btn {
       background-color: #d40000;
       color: white;
       border: none;
-      padding: 10px 20px;
+      padding: 12px 24px;
       font-size: 16px;
       border-radius: 8px;
       cursor: pointer;
-      transition: background-color 0.3s;
+      transition: all 0.3s;
+      position: relative;
+      overflow: hidden;
+      min-width: 120px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
-    #main button:hover {
+    .arrow-btn:hover {
       background-color: #bb0000;
+      transform: translateY(-2px);
     }
 
-    /* Анимация логотипа */
+    .arrow-btn:active {
+      transform: translateY(1px);
+    }
+
+    .arrow-btn::before {
+      content: '';
+      position: absolute;
+      width: 12px;
+      height: 12px;
+      border-top: 2px solid white;
+      border-right: 2px solid white;
+      transition: all 0.3s;
+    }
+
+    .left-arrow::before {
+      transform: rotate(-135deg);
+      left: 20px;
+    }
+
+    .right-arrow::before {
+      transform: rotate(45deg);
+      right: 20px;
+    }
+
+    .left-arrow:hover::before {
+      transform: rotate(-135deg) translateX(-3px) !important;
+      left: 17px;
+    }
+
+    .right-arrow:hover::before {
+      transform: rotate(45deg) translateX(3px);
+      right: 17px;
+    }
+
     #logoAnimation {
       position: fixed;
       top: 50%;
@@ -103,7 +150,6 @@
       }
     }
 
-    /* Анимация появления */
     @keyframes fadeIn {
       from {
         opacity: 0;
@@ -121,33 +167,46 @@
   <div id="main">
     <h1>Пример Telegram WebApp</h1>
     <p>Это простой пример взаимодействия Telegram WebApp с пользователем.</p>
-    <button id="quizBtn">Перейти к викторине</button>
+    <div class="buttons-container">
+      <button class="arrow-btn left-arrow" id="EdBtn">Назад</button>
+      <button class="arrow-btn right-arrow" id="quizBtn">Далее</button>
+    </div>
   </div>
 
-  <!-- Логотип MOEX с анимацией -->
   <div id="logoAnimation">
     <img src="moex.png" alt="MOEX logo" />
   </div>
 
   <script>
     const quizBtn = document.getElementById('quizBtn');
+    const EdBtn = document.getElementById('EdBtn');
     const mainContent = document.getElementById('main');
     const logo = document.getElementById('logoAnimation');
 
     quizBtn.addEventListener('click', () => {
-      // Скрыть основной контент с анимацией
       mainContent.classList.add('fade-out');
 
-      // Показать логотип и запустить анимацию
       setTimeout(() => {
         mainContent.style.display = 'none';
         logo.style.display = 'block';
 
-        // После завершения анимации — переход на quiz.html
         setTimeout(() => {
           window.location.href = 'quiz.html';
-        }, 1000); // время анимации логотипа
-      }, 200); // время fade-out
+        }, 1000);
+      }, 200);
+    });
+
+    EdBtn.addEventListener('click', () => {
+      mainContent.classList.add('fade-out');
+
+      setTimeout(() => {
+        mainContent.style.display = 'none';
+        logo.style.display = 'block';
+
+        setTimeout(() => {
+          window.location.href = 'education.html';
+        }, 1000);
+      }, 200);
     });
   </script>
 

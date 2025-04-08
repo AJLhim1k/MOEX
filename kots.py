@@ -1,7 +1,5 @@
 import mplfinance as mpf
 import pandas as pd
-import os
-from matplotlib.pyplot import savefig
 
 
 def make_graph(p, mode):

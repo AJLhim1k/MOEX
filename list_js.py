@@ -21,13 +21,9 @@ def new_q():
         if os.path.exists(csv_path):
             df = pd.read_csv(csv_path)
             if not df.empty and 'open' in df.columns and 'close' in df.columns:
-                try:
-                    open_price = df['open'].iloc[0]
-                    close_price = df['close'].iloc[-1]
-                    direction = bool(close_price > open_price)
-                except Exception as e:
-                    print(f"Ошибка при обработке {csv_path}: {e}")
-                    direction = None
+                open_price = df['open'].iloc[0]
+                close_price = df['close'].iloc[-1]
+                direction = bool(close_price > open_price)
 
         result.append({
             "file": filename,
