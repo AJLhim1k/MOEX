@@ -42,4 +42,4 @@ def make_graph(p, mode):
         fig.savefig(f'.{delimeter}answers{delimeter}plot{p}.png', bbox_inches='tight', )
 
 if __name__ == '__main__':
-    make_graph(100, 'ans')
+    make_graph(101, 'q')

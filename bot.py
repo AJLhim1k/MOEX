@@ -22,7 +22,7 @@ bot = Bot(token=TELEGRAM_API_KEY)
 dp = Dispatcher()
 
 
-@dp.message(Command('start'))
+@dp.message(Command('викторина'))
 async def send_welcome(message: message, state: FSMContext):
     kb = [
         [KeyboardButton(text="Long shares", )],
