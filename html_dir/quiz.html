@@ -182,13 +182,13 @@
       }, 500);
     });
 
-    fetch("questions/list.json")
+    fetch("../questions/list.json")
       .then(response => response.json())
       .then(items => {
         if (!items.length) throw new Error("Список файлов пуст");
 
         const randomItem = items[Math.floor(Math.random() * items.length)];
-        document.getElementById("graph-img").src = `questions/${randomItem.file}`;
+        document.getElementById("graph-img").src = `../questions/${randomItem.file}`;
         correctAnswer = randomItem.up;
         currentFilename = randomItem.file;
       })

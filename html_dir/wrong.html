@@ -111,7 +111,7 @@
     const params = new URLSearchParams(window.location.search);
     const filename = params.get('file');
     if (filename) {
-      document.getElementById("answer-graph").src = `answers/${filename}`;
+      document.getElementById("answer-graph").src = `../answers/${filename}`;
     } else {
       document.getElementById("answer-graph").alt = "Файл не указан.";
     }
