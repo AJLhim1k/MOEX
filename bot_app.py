@@ -1,67 +1,92 @@
 import asyncio
-from aiogram import Bot, Dispatcher, types, F
-from aiogram.types import KeyboardButton, ReplyKeyboardMarkup, WebAppInfo
-from aiogram.filters.command import Command
-from dotenv import load_dotenv
 import os
 import sqlite3
 from datetime import datetime
+from dotenv import load_dotenv
+from fastapi import FastAPI, Request
+from fastapi.responses import JSONResponse
+from aiogram import Bot, Dispatcher, types
+from aiogram.filters.command import Command
+from aiogram.fsm.context import FSMContext
+from aiogram.types import KeyboardButton, ReplyKeyboardMarkup, WebAppInfo
+from fastapi.middleware.cors import CORSMiddleware
 
 load_dotenv()
-TELEGRAM_API_KEY = os.getenv('TELEGRAM_API_KEY')
-
-bot = Bot(token=TELEGRAM_API_KEY)
+bot = Bot(token=os.getenv("TELEGRAM_API_KEY"))
 dp = Dispatcher()
+app = FastAPI()
 
-def get_user_data(user_id, username):
-    conn = sqlite3.connect("users.db")
-    cursor = conn.cursor()
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"]
+)
 
-    today = datetime.now().strftime('%Y-%m-%d')
+DB_PATH = "users.db"
 
-    cursor.execute("SELECT * FROM users WHERE user_id=?", (user_id,))
-    row = cursor.fetchone()
-
-    if not row:
-        cursor.execute(
-            "INSERT INTO users (user_id, username, score, request_date, request_count) VALUES (?, ?, ?, ?, ?)",
-            (user_id, username, 100, today, 0)
-        )
-        conn.commit()
-        conn.close()
-        return (100, 0, today)
-
-    score, request_count, request_date = row[2], row[4], row[3]
-
-    if request_date != today:
-        request_count = 0
-        cursor.execute("UPDATE users SET request_date=?, request_count=0 WHERE user_id=?",
-                       (today, user_id))
-        conn.commit()
-
+def init_db():
+    if os.path.exists(DB_PATH):
+        os.remove(DB_PATH)
+    conn = sqlite3.connect(DB_PATH)
+    cur = conn.cursor()
+    cur.execute("""
+    CREATE TABLE IF NOT EXISTS users (
+        user_id INTEGER PRIMARY KEY,
+        username TEXT,
+        points INTEGER DEFAULT 100,
+        attempts_today INTEGER DEFAULT 0,
+        last_attempt_date TEXT
+    )
+    """)
+    conn.commit()
     conn.close()
-    return (score, request_count, today)
 
-@dp.message(Command('start'))
-async def send_welcome(message: types.Message):
-    user_id = message.from_user.id
-    username = message.from_user.username or "Без ника"
+init_db()
 
-    score, count, today = get_user_data(user_id, username)
-
-    reply_markup = ReplyKeyboardMarkup(
-        keyboard=[[
-            KeyboardButton(
-                text='Играть',
-                web_app=WebAppInfo(url=f'https://ajlhim1k.github.io/MOEX/html_dir/bot_app.html?score={score}&count={count}')
-            )
-        ]],
+@dp.message(Command("start"))
+async def start_handler(message: types.Message, state: FSMContext):
+    markup = ReplyKeyboardMarkup(
+        keyboard=[[KeyboardButton(text="Играть", web_app=WebAppInfo(url="https://ajlhim1k.github.io/MOEX/html_dir/bot_app.html"))]],
         resize_keyboard=True
     )
-    await message.answer(f"Привет, {username}!\nУ тебя {score} баллов.\nСегодня ты использовал {count}/5 попыток.", reply_markup=reply_markup)
+    await message.answer("Привет! Готов сыграть?", reply_markup=markup)
 
-async def main():
-    await dp.start_polling(bot)
+@app.post("/check_user/")
+async def check_user(request: Request):
+    data = await request.json()
+    user_id = int(data.get("user_id"))
+    username = data.get("username")
 
-if __name__ == '__main__':
-    asyncio.run(main())
+    conn = sqlite3.connect(DB_PATH)
+    cur = conn.cursor()
+
+    cur.execute("SELECT * FROM users WHERE user_id = ?", (user_id,))
+    row = cur.fetchone()
+
+    today = datetime.now().strftime("%Y-%m-%d")
+
+    if row:
+        last_date = row[4]
+        if last_date != today:
+            cur.execute("UPDATE users SET attempts_today = 0, last_attempt_date = ? WHERE user_id = ?", (today, user_id))
+            conn.commit()
+        cur.execute("SELECT points, attempts_today FROM users WHERE user_id = ?", (user_id,))
+        points, attempts_today = cur.fetchone()
+    else:
+        cur.execute("INSERT INTO users (user_id, username, points, attempts_today, last_attempt_date) VALUES (?, ?, ?, ?, ?)",
+                    (user_id, username, 100, 0, today))
+        conn.commit()
+        points = 100
+        attempts_today = 0
+
+    conn.close()
+
+    if attempts_today >= 5:
+        return JSONResponse(content={"limit_reached": True})
+    else:
+        return JSONResponse(content={"username": username, "points": points, "attempts_today": attempts_today})
+
+@app.on_event("startup")
+async def startup_event():
+    asyncio.create_task(dp.start_polling(bot))

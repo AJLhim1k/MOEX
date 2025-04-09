@@ -1,5 +1,9 @@
 import sqlite3
 from datetime import datetime
+import os
+
+if os.path.exists('users.db'):
+    os.remove('users.db')
 
 conn = sqlite3.connect('users.db')
 cursor = conn.cursor()

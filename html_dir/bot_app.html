@@ -133,69 +133,74 @@
   </style>
 </head>
 <body>
-
   <div id="main">
     <h1>Пример Telegram WebApp</h1>
-    <p>Это простой пример взаимодействия Telegram WebApp с пользователем.</p>
-
-    <div id="rating">
-      <p>👤 Пользователь: <span id="username">загрузка...</span></p>
-      <p>💯 Баллы: <span id="score">0</span></p>
-    </div>
-
+    <p id="ratingText">Загрузка рейтинга...</p>
     <div class="buttons-container">
       <button class="arrow-btn left-arrow" id="EdBtn">Назад</button>
       <button class="arrow-btn right-arrow" id="quizBtn">Далее</button>
     </div>
   </div>
 
+  <div id="logoAnimation">
+    <img src="moex.png" alt="MOEX logo">
+  </div>
+
   <script>
-    const tg = window.Telegram.WebApp;
-    const userId = tg.initDataUnsafe?.user?.id;
+    const quizBtn = document.getElementById('quizBtn');
+    const EdBtn = document.getElementById('EdBtn');
+    const mainContent = document.getElementById('main');
+    const logo = document.getElementById('logoAnimation');
+    const ratingText = document.getElementById('ratingText');
 
-    async function fetchUserInfo() {
+    async function fetchRating() {
       try {
-        const res = await fetch(`https://your-server.com/get_user_info?user_id=${userId}`);
-        const data = await res.json();
+        const tg = window.Telegram.WebApp;
+        tg.expand();
+        const user = tg.initDataUnsafe.user;
 
-        document.getElementById('username').textContent = data.username || 'Гость';
-        document.getElementById('score').textContent = data.score ?? '0';
+        const response = await fetch('http://localhost:8000/check_user/', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({
+            user_id: user.id,
+            username: user.username || user.first_name
+          })
+        });
 
-        if (data.daily_requests >= 5) {
-          window.location.href = 'limit_reached.html';
+        const data = await response.json();
+
+        if (data.limit_reached) {
+          window.location.href = "limit_reached.html";
+        } else {
+          ratingText.innerText = `Игрок: ${data.username}, Баллы: ${data.points}, Попыток сегодня: ${data.attempts_today}/5`;
         }
-      } catch (error) {
-        console.error("Ошибка при загрузке данных:", error);
+      } catch (e) {
+        ratingText.innerText = "Ошибка загрузки рейтинга.";
       }
     }
 
-    fetchUserInfo();
-    const res = await fetch(`http://localhost:8000/get_user_info?user_id=${userId}`);
+    fetchRating();
 
-    document.getElementById('quizBtn').addEventListener('click', () => {
-      window.location.href = 'quiz.html';
-    });
-
-    document.getElementById('EdBtn').addEventListener('click', () => {
-      window.location.href = 'education.html';
-    });
-    const urlParams = new URLSearchParams(window.location.search);
-  const score = urlParams.get('score');
-  const count = urlParams.get('count');
-
-  if (score !== null && count !== null) {
-    const ratingDisplay = document.createElement('div');
-    ratingDisplay.style.marginTop = '20px';
-    ratingDisplay.innerHTML = `<strong>Ваш рейтинг: ${score}</strong><br><strong>Попыток сегодня: ${count}/5</strong>`;
-    document.getElementById('main').appendChild(ratingDisplay);
-
-    if (parseInt(count) >= 5) {
+    quizBtn.addEventListener('click', () => {
+      mainContent.classList.add('fade-out');
       setTimeout(() => {
-        window.location.href = "limit_reached.html";
-      }, 1500);
-    }
-  }
+        mainContent.style.display = 'none';
+        logo.style.display = 'block';
+        setTimeout(() => window.location.href = 'quiz.html', 1000);
+      }, 200);
+    });
+
+    EdBtn.addEventListener('click', () => {
+      mainContent.classList.add('fade-out');
+      setTimeout(() => {
+        mainContent.style.display = 'none';
+        logo.style.display = 'block';
+        setTimeout(() => window.location.href = 'education.html', 1000);
+      }, 200);
+    });
   </script>
+
 
 </body>
 </html>
