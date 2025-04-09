@@ -29,7 +29,7 @@ async def send_welcome(message: types.Message):
             [
                 KeyboardButton(
                     text='Играть',
-                    web_app=WebAppInfo(url='https://ajlhim1k.github.io/MOEX/bot_app.html'))
+                    web_app=WebAppInfo(url='https://ajlhim1k.github.io/MOEX/html_dir/bot_app.html'))
             ]
         ],
         resize_keyboard=True
