@@ -6,7 +6,6 @@
   <title>Telegram WebApp Пример</title>
 
   <link href="https://fonts.googleapis.com/css?family=Muli&display=swap" rel="stylesheet" />
-
   <style>
     body {
       font-family: 'Muli', sans-serif;
@@ -37,12 +36,20 @@
 
     #main h1 {
       font-size: 24px;
-      margin-bottom: 20px;
+      margin-bottom: 10px;
     }
 
     #main p {
       font-size: 16px;
-      margin-bottom: 20px;
+      margin-bottom: 10px;
+    }
+
+    #rating {
+      margin-top: 10px;
+      font-size: 16px;
+      background-color: #f0f0f0;
+      padding: 10px;
+      border-radius: 8px;
     }
 
     .buttons-container {
@@ -108,35 +115,9 @@
       right: 17px;
     }
 
-    #logoAnimation {
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%) scale(0.8);
-      opacity: 0;
-      animation: logoEnter 1.2s ease-out forwards;
-      z-index: 10;
-      display: none;
-    }
-
-    #logoAnimation img {
-      width: 220px;
-      height: auto;
-    }
-
-    @keyframes logoEnter {
-      0% {
-        transform: translate(-50%, -50%) scale(1.2);
-        opacity: 0;
-      }
-      50% {
-        transform: translate(-50%, -50%) scale(1.6);
-        opacity: 1;
-      }
-      100% {
-        transform: translate(-50%, -50%) scale(1.4);
-        opacity: 1;
-      }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
     .fade-out {
@@ -149,17 +130,6 @@
         transform: scale(0.95);
       }
     }
-
-    @keyframes fadeIn {
-      from {
-        opacity: 0;
-        transform: translateY(20px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
   </style>
 </head>
 <body>
@@ -167,47 +137,64 @@
   <div id="main">
     <h1>Пример Telegram WebApp</h1>
     <p>Это простой пример взаимодействия Telegram WebApp с пользователем.</p>
+
+    <div id="rating">
+      <p>👤 Пользователь: <span id="username">загрузка...</span></p>
+      <p>💯 Баллы: <span id="score">0</span></p>
+    </div>
+
     <div class="buttons-container">
       <button class="arrow-btn left-arrow" id="EdBtn">Назад</button>
       <button class="arrow-btn right-arrow" id="quizBtn">Далее</button>
     </div>
   </div>
 
-  <div id="logoAnimation">
-    <img src="moex.png" alt="MOEX logo" />
-  </div>
-
   <script>
-    const quizBtn = document.getElementById('quizBtn');
-    const EdBtn = document.getElementById('EdBtn');
-    const mainContent = document.getElementById('main');
-    const logo = document.getElementById('logoAnimation');
+    const tg = window.Telegram.WebApp;
+    const userId = tg.initDataUnsafe?.user?.id;
 
-    quizBtn.addEventListener('click', () => {
-      mainContent.classList.add('fade-out');
+    async function fetchUserInfo() {
+      try {
+        const res = await fetch(`https://your-server.com/get_user_info?user_id=${userId}`);
+        const data = await res.json();
 
-      setTimeout(() => {
-        mainContent.style.display = 'none';
-        logo.style.display = 'block';
+        document.getElementById('username').textContent = data.username || 'Гость';
+        document.getElementById('score').textContent = data.score ?? '0';
 
-        setTimeout(() => {
-          window.location.href = 'quiz.html';
-        }, 1000);
-      }, 200);
+        if (data.daily_requests >= 5) {
+          window.location.href = 'limit_reached.html';
+        }
+      } catch (error) {
+        console.error("Ошибка при загрузке данных:", error);
+      }
+    }
+
+    fetchUserInfo();
+    const res = await fetch(`http://localhost:8000/get_user_info?user_id=${userId}`);
+
+    document.getElementById('quizBtn').addEventListener('click', () => {
+      window.location.href = 'quiz.html';
     });
 
-    EdBtn.addEventListener('click', () => {
-      mainContent.classList.add('fade-out');
-
-      setTimeout(() => {
-        mainContent.style.display = 'none';
-        logo.style.display = 'block';
-
-        setTimeout(() => {
-          window.location.href = 'education.html';
-        }, 1000);
-      }, 200);
+    document.getElementById('EdBtn').addEventListener('click', () => {
+      window.location.href = 'education.html';
     });
+    const urlParams = new URLSearchParams(window.location.search);
+  const score = urlParams.get('score');
+  const count = urlParams.get('count');
+
+  if (score !== null && count !== null) {
+    const ratingDisplay = document.createElement('div');
+    ratingDisplay.style.marginTop = '20px';
+    ratingDisplay.innerHTML = `<strong>Ваш рейтинг: ${score}</strong><br><strong>Попыток сегодня: ${count}/5</strong>`;
+    document.getElementById('main').appendChild(ratingDisplay);
+
+    if (parseInt(count) >= 5) {
+      setTimeout(() => {
+        window.location.href = "limit_reached.html";
+      }, 1500);
+    }
+  }
   </script>
 
 </body>
