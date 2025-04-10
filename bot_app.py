@@ -42,7 +42,7 @@ async def check_user(request):
 @dp.message(Command("start"))
 async def start_cmd(message: types.Message):
     kb = types.ReplyKeyboardMarkup(resize_keyboard=True, keyboard=[
-        [types.KeyboardButton(text="Открыть WebApp", web_app=types.WebAppInfo(url="https://web-production-c57f4.up.railway.app/"))]
+        [types.KeyboardButton(text="Открыть WebApp", web_app=types.WebAppInfo(url="https://moex-production.up.railway.app/"))]
     ])
     await message.answer("Привет! Нажми кнопку ниже:", reply_markup=kb)
 
