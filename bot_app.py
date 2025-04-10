@@ -1,31 +1,35 @@
-import asyncio
 import os
-from dotenv import load_dotenv
+from aiohttp import web
 from aiogram import Bot, Dispatcher, types
 from aiogram.filters.command import Command
-from aiogram.types import KeyboardButton, ReplyKeyboardMarkup, WebAppInfo
+from dotenv import load_dotenv
 
 load_dotenv()
-TELEGRAM_API_KEY = os.getenv('TELEGRAM_API_KEY')
-
-bot = Bot(token=TELEGRAM_API_KEY)
+bot = Bot(token=os.getenv("TELEGRAM_API_KEY"))
 dp = Dispatcher()
 
-@dp.message(Command("start"))
-async def send_welcome(message: types.Message):
-    markup = ReplyKeyboardMarkup(
-        keyboard=[[
-            KeyboardButton(
-                text='Играть',
-                web_app=WebAppInfo(url='https://ajlhim1k.github.io/MOEX/html_dir/bot_app.html')
-            )
-        ]],
-        resize_keyboard=True
-    )
-    await message.answer("Привет! Начнем игру?", reply_markup=markup)
+# AIOHTTP server for static HTML
+async def index(request):
+    return web.FileResponse('./static/bot_app.html')
 
-async def main():
-    await dp.start_polling(bot)
+app = web.Application()
+app.router.add_get('/', index)
+app.router.add_static('/static/', path='static', name='static')
+
+# Telegram command handler
+@dp.message(Command("start"))
+async def start_cmd(message: types.Message):
+    kb = types.ReplyKeyboardMarkup(resize_keyboard=True, keyboard=[
+        [types.KeyboardButton(text="Открыть WebApp", web_app=types.WebAppInfo(url="https://your-railway-url.up.railway.app/"))]
+    ])
+    await message.answer("Привет! Нажми кнопку ниже:", reply_markup=kb)
+
+# Запуск Telegram и Web сервера
+async def on_startup(app):
+    import asyncio
+    asyncio.create_task(dp.start_polling(bot))
+
+app.on_startup.append(on_startup)
 
 if __name__ == '__main__':
-    asyncio.run(main())
+    web.run_app(app, port=int(os.getenv('PORT', 8080)))
