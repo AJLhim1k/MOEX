@@ -14,7 +14,7 @@ async def index(request):
 
 app = web.Application()
 app.router.add_get('/', index)
-app.router.add_static('/static/', path='static', name='static')
+app.router.add_static('/html_dir/', path='html_dir', name='html_dir')
 
 # Telegram command handler
 @dp.message(Command("start"))
