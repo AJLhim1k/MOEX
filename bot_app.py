@@ -10,7 +10,7 @@ dp = Dispatcher()
 
 # AIOHTTP server for static HTML
 async def index(request):
-    return web.FileResponse('./static/bot_app.html')
+    return web.FileResponse('./html_dir/bot_app.html')
 
 app = web.Application()
 app.router.add_get('/', index)
@@ -20,7 +20,7 @@ app.router.add_static('/html_dir/', path='html_dir', name='html_dir')
 @dp.message(Command("start"))
 async def start_cmd(message: types.Message):
     kb = types.ReplyKeyboardMarkup(resize_keyboard=True, keyboard=[
-        [types.KeyboardButton(text="Открыть WebApp", web_app=types.WebAppInfo(url="https://your-railway-url.up.railway.app/"))]
+        [types.KeyboardButton(text="Открыть WebApp", web_app=types.WebAppInfo(url="https://web-production-1d265.up.railway.app/"))]
     ])
     await message.answer("Привет! Нажми кнопку ниже:", reply_markup=kb)
 
