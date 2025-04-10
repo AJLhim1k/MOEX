@@ -1,45 +1,35 @@
-from aiohttp import web
-import aiosqlite
-from datetime import date
+from flask import Flask, request, jsonify
+from db import get_or_create_user, can_user_request, get_score, get_requests_today
+from flask_cors import CORS
+import os
 
-async def get_user_info(request):
-    user_id = request.query.get("user_id")
-    if not user_id:
-        return web.json_response({"error": "user_id required"}, status=400)
 
-    async with aiosqlite.connect("db.sqlite") as db:
-        async with db.execute("SELECT username, score, daily_requests, last_request FROM users WHERE user_id = ?", (user_id,)) as cursor:
-            row = await cursor.fetchone()
+app = Flask(__name__)
+CORS(app)
 
-        today = str(date.today())
+PORT = int(os.environ.get("PORT", 8000))
+app.run(host="0.0.0.0", port=PORT)
 
-        if row:
-            username, score, daily_requests, last_request = row
+@app.route('/api/check_user', methods=['POST'])
+def check_user():
+    data = request.get_json()
+    user_id = data.get('user_id')
+    username = data.get('username')
 
-            if last_request != today:
-                daily_requests = 0
-                async with db.execute("""
-                    UPDATE users SET daily_requests = 0, last_request = ? WHERE user_id = ?
-                """, (today, user_id)):
-                    await db.commit()
-        else:
-            username = f"User_{user_id}"
-            score = 100
-            daily_requests = 0
-            await db.execute("""
-                INSERT INTO users (user_id, username, score, daily_requests, last_request)
-                VALUES (?, ?, ?, ?, ?)
-            """, (user_id, username, score, daily_requests, today))
-            await db.commit()
+    if not user_id or not username:
+        return jsonify({'error': 'Missing user_id or username'}), 400
 
-        return web.json_response({
-            "username": username,
-            "score": score,
-            "daily_requests": daily_requests
-        })
+    get_or_create_user(user_id, username)
+    allowed = can_user_request(user_id)
+    score = get_score(user_id)
+    attempts = get_requests_today(user_id)
 
-app = web.Application()
-app.router.add_get("/get_user_info", get_user_info)
+    return jsonify({
+        'username': username,
+        'points': score,
+        'attempts_today': attempts,
+        'limit_reached': not allowed
+    })
 
 if __name__ == '__main__':
-    web.run_app(app, port=8000)
+    app.run(port=8000)

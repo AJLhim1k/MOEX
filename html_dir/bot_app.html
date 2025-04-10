@@ -146,60 +146,61 @@
     <img src="moex.png" alt="MOEX logo">
   </div>
 
-  <script>
-    const quizBtn = document.getElementById('quizBtn');
-    const EdBtn = document.getElementById('EdBtn');
-    const mainContent = document.getElementById('main');
-    const logo = document.getElementById('logoAnimation');
-    const ratingText = document.getElementById('ratingText');
+<script>
+    const API_URL = 'https://your-backend-domain.com/api/check_user'; // Замените на ваш бэкенд
 
     async function fetchRating() {
-      try {
-        const tg = window.Telegram.WebApp;
-        tg.expand();
-        const user = tg.initDataUnsafe.user;
+        try {
+            const tg = window.Telegram.WebApp;
+            tg.expand();
 
-        const response = await fetch('http://localhost:8000/check_user/', {
-          method: 'POST',
-          headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify({
-            user_id: user.id,
-            username: user.username || user.first_name
-          })
-        });
+            if (!tg.initDataUnsafe?.user) {
+                throw new Error("User data not available");
+            }
 
-        const data = await response.json();
+            const user = tg.initDataUnsafe.user;
+            const initData = tg.initData;
 
-        if (data.limit_reached) {
-          window.location.href = "limit_reached.html";
-        } else {
-          ratingText.innerText = `Игрок: ${data.username}, Баллы: ${data.points}, Попыток сегодня: ${data.attempts_today}/5`;
+            const response = await fetch(API_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Telegram-Init-Data': initData
+                },
+                body: JSON.stringify({
+                    user_id: user.id,
+                    username: user.username || user.first_name
+                })
+            });
+
+            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+
+            const data = await response.json();
+
+            if (data.limit_reached) {
+                tg.showAlert("Вы исчерпали лимит попыток на сегодня");
+                window.location.href = "limit_reached.html";
+            } else {
+                document.getElementById('ratingText').innerText =
+                    `Игрок: ${data.username}, Баллы: ${data.points}, Попыток: ${data.attempts_today}/5`;
+            }
+        } catch (e) {
+            console.error("Error:", e);
+            document.getElementById('ratingText').innerText =
+                "Ошибка загрузки данных. Попробуйте позже.";
         }
-      } catch (e) {
-        ratingText.innerText = "Ошибка загрузки рейтинга.";
-      }
     }
 
-    fetchRating();
-
-    quizBtn.addEventListener('click', () => {
-      mainContent.classList.add('fade-out');
-      setTimeout(() => {
-        mainContent.style.display = 'none';
-        logo.style.display = 'block';
-        setTimeout(() => window.location.href = 'quiz.html', 1000);
-      }, 200);
-    });
-
-    EdBtn.addEventListener('click', () => {
-      mainContent.classList.add('fade-out');
-      setTimeout(() => {
-        mainContent.style.display = 'none';
-        logo.style.display = 'block';
-        setTimeout(() => window.location.href = 'education.html', 1000);
-      }, 200);
-    });
-  </script>
+    // Инициализация при загрузке
+    if (window.Telegram?.WebApp) {
+        Telegram.WebApp.ready();
+        Telegram.WebApp.enableClosingConfirmation();
+        fetchRating();
+    } else {
+        // Режим разработки
+        fetchRating();
+    }
+</script>
 
 
 </body>

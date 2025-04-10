@@ -1,19 +1,8 @@
 import sqlite3
 from datetime import datetime
 
-conn = sqlite3.connect("users.db")
+conn = sqlite3.connect("users.db", check_same_thread=False)
 cursor = conn.cursor()
-
-cursor.execute('''
-CREATE TABLE IF NOT EXISTS users (
-    id INTEGER PRIMARY KEY,
-    username TEXT,
-    score INTEGER DEFAULT 100,
-    requests_today INTEGER DEFAULT 0,
-    last_request_date TEXT
-)
-''')
-conn.commit()
 
 def get_or_create_user(user_id, username):
     cursor.execute("SELECT * FROM users WHERE id = ?", (user_id,))
@@ -49,3 +38,8 @@ def get_score(user_id):
     cursor.execute("SELECT score FROM users WHERE id = ?", (user_id,))
     score = cursor.fetchone()
     return score[0] if score else None
+
+def get_requests_today(user_id):
+    cursor.execute("SELECT requests_today FROM users WHERE id = ?", (user_id,))
+    result = cursor.fetchone()
+    return result[0] if result else 0
